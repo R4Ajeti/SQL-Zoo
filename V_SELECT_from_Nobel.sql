@@ -23,94 +23,70 @@ SELECT winner FROM nobel
 SELECT * FROM nobel
  WHERE subject = 'Literature' AND yr between 1980 AND 1989;
 
---6) Show the countries which have a name that includes the word 'United'
-
-SELECT name FROM world
-WHERE name like '%United%';
-
 /*
-  Two ways to be big: A country is big if it has an area of more than 3 million sq km or it has a population of more than 250 million.
+  Theodore Roosevelt
+  Woodrow Wilson
+  Jimmy Carter
+  Barack Obama
 */
---7) Show the countries that are big by area or big by population. Show name, population and area.
+--6) Show all details of the presidential winners:
 
-SELECT name,population,area from world
-WHERE area>3000000 or population>250000000;
+SELECT * FROM nobel
+ WHERE winner IN ('Theodore Roosevelt', 'Woodrow Wilson', 'Jimmy Carter', 'Barack Obama');
 
-/*
-  Australia has a big area but a small population, it should be included.
-  Indonesia has a big population but a small area, it should be included.
-  China has a big population and big area, it should be excluded.
-  United Kingdom has a small population and a small area, it should be excluded.
-*/
---8) Exclusive OR (XOR). Show the countries that are big by area or big by population but not both. Show name, population and area.
+--7) Show the winners with first name John
 
-SELECT name, population, area from world
-WHERE area>3000000 XOR population>250000000;
+SELECT winner FROM nobel
+ WHERE winner like 'John %';
 
-/*
-  Show the name and population in millions and the GDP in billions for the countries of the continent 'South America'. Use the ROUND function to show the values to two decimal places.
-*/
---9) For South America show population in millions and GDP in billions both to 2 decimal places.
+--8) Show the year, subject, and name of Physics winners for 1980 together with the Chemistry winners for 1984.
 
-SELECT name, ROUND(population/1000000,2) as 'population/1000000', ROUND(gdp/1000000000,2) as 'gdp/1000000000' from world
-WHERE continent='South America';
+SELECT yr,subject,winner FROM nobel
+ WHERE (subject = 'Physics' AND yr = 1980) OR (subject = 'Chemistry' AND yr = 1984);
 
-/*
-  Show the name and per-capita GDP for those countries with a GDP of at least one trillion (1000000000000; that is 12 zeros). Round this value to the nearest 1000.
-*/
---10) Show per-capita GDP for the trillion dollar countries to the nearest $1000.
+--9) Show the year, subject, and name of winners for 1980 excluding Chemistry and Medicine
 
-SELECT name,ROUND(gdp/(population*1000))*1000 from world
-WHERE gdp>1000000000000;
+SELECT yr,subject,winner FROM nobel
+ WHERE yr = 1980 AND subject <> 'Chemistry' AND subject <> 'Medicine'
+
+--10) Early Medicine, Late Literature
+
+SELECT yr,subject,winner FROM nobel
+ WHERE (subject = 'Medicine' AND yr < 1910) OR (subject = 'Literature' AND yr >= 2004);
 
 /*
   Greece has capital Athens.
-
   Each of the strings 'Greece', and 'Athens' has 6 characters.
   You can use the LENGTH function to find the number of characters in a string
 */
---11) Show the name and capital where the name and the capital have the same number of characters.
+--11) Find all details of the prize won by PETER GRÜNBERG
 
-SELECT name, capital
-  FROM world
- WHERE LENGTH(name)=LENGTH(capital);
-
-/*
-  The capital of Sweden is Stockholm. Both words start with the letter 'S'.
-  
-  You can use the function LEFT to isolate the first character.
-  You can use <> as the NOT EQUALS operator.
-*/
---12) Show the name and the capital where the first letters of each match. Don't include countries where the name and the capital are the same word.
-
-SELECT name, capital
-FROM world
-where LEFT(name,1)=LEFT(capital,1) and name<>capital;
+SELECT * from nobel
+  WHERE winner = 'PETER GRÜNBERG';;
 
 /*
-  Equatorial Guinea and Dominican Republic have all of the vowels (a e i o u) in the name. They don't count because they have more than one word in the name.
-  
-  You can use the phrase name NOT LIKE '%a%' to exclude characters from your results.
-  The query shown misses countries like Bahamas and Belarus because they contain at least one 'a'
+  You can't put a single quote in a quote string directly. You can use two single quotes within a quoted string.
+  Change double "" with ''
 */
---13) Find the country that has all the vowels and no spaces in its name
+--12) Find all details of the prize won by EUGENE O'NEILL
 
-SELECT capital, name FROM world
- WHERE capital like concat('%', concat(name,'%'));
+SELECT * from nobel
+  WHERE winner = "EUGENE O\'NEILL";
 
 /*
-  You should include Mexico City as it is longer than Mexico. You should not include Luxembourg as the capital is the same as the country.
+  Knights in order
 */
---14) Find the capital and the name where the capital is an extension of name of the country.
+--13) List the winners, year and subject where the winner starts with Sir. Show the the most recent first, then by name order.
 
-SELECT capital, name FROM world
- WHERE capital LIKE concat(name,'%') and name<>capital;
+SELECT winner,yr,subject FROM nobel
+  WHERE winner like 'Sir%'
+ORDER BY yr desc,winner;;
 
 /*
-  For Monaco-Ville the name is Monaco and the extension is -Ville.
-  You can use the SQL function REPLACE.
+  The expression subject IN ('Chemistry','Physics') can be used as a value - it will be 0 or 1.
 */
---15) Show the name and the extension where the capital is an extension of name of the country.
+--14) Show the 1984 winners and subject ordered by subject and winner name; but list Chemistry and Physics last.
 
-SELECT name, REPLACE(capital, name,'') as ext FROM world
- WHERE capital LIKE concat(name,'%') and name<>capital;
+SELECT winner, subject FROM nobel
+  WHERE yr=1984
+ORDER BY subject IN ('Physics','Chemistry'),subject,winner;
